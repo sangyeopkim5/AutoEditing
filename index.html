@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            padding: 16px;
+            font-family: adobe-clean, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #1E1E1E;
+            color: #E8E8E8;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-section {
+            background: #2D2D2D;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .status-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .status-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .indicator.connected {
+            background: #4CAF50;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+        }
+
+        .indicator.disconnected {
+            background: #F44336;
+        }
+
+        .indicator.connecting {
+            background: #FFC107;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-label {
+            font-size: 12px;
+            color: #B0B0B0;
+        }
+
+        .status-value {
+            font-size: 13px;
+            color: #E8E8E8;
+            font-weight: 500;
+        }
+
+        .log-section {
+            background: #252525;
+            border-radius: 8px;
+            padding: 12px;
+            max-height: 280px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .log-entry {
+            padding: 3px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-time {
+            color: #666;
+            margin-right: 8px;
+        }
+
+        .log-info { color: #5EB8FF; }
+        .log-success { color: #7FE89C; }
+        .log-error { color: #FF6B6B; }
+        .log-warn { color: #FFD93D; }
+
+        .manual-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #333;
+        }
+
+        .manual-section h3 {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px 16px;
+            background: #0D66D0;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #095ABA;
+        }
+
+        button:active {
+            background: #064C9C;
+        }
+
+        button:disabled {
+            background: #444;
+            cursor: not-allowed;
+        }
+
+        .help-text {
+            margin-top: 12px;
+            font-size: 11px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .help-text code {
+            background: #333;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', monospace;
+            color: #9CDCFE;
+        }
+    </style>
+</head>
+<body>
+    <h1>📡 Remote Project Creator</h1>
+    
+    <div class="status-section">
+        <div class="status-row">
+            <span id="indicator" class="indicator disconnected"></span>
+            <span class="status-label">서버 연결:</span>
+            <span id="statusText" class="status-value">연결 안됨</span>
+        </div>
+        <div class="status-row">
+            <span class="status-label">저장 경로:</span>
+            <span id="savePath" class="status-value">Desktop/inbox</span>
+        </div>
+    </div>
+
+    <div class="log-section" id="logContainer">
+        <div class="log-entry">
+            <span class="log-time">--:--:--</span>
+            <span class="log-info">플러그인 초기화 대기 중...</span>
+        </div>
+    </div>
+
+    <div class="manual-section">
+        <h3>수동 테스트</h3>
+        <button id="testBtn" disabled>프로젝트 생성 테스트</button>
+        
+        <div class="help-text">
+            외부에서 트리거하려면:<br>
+            <code>curl -X POST http://localhost:3000/create-project</code>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+</html>
