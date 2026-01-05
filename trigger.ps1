@@ -1,15 +1,16 @@
 # Premiere Pro Remote Project Creator - PowerShell Trigger
-# Usage: .\trigger.ps1 [-ProjectName "MyProject"] [-SequenceName "Main"]
+# Usage: .\trigger.ps1 [-ProjectName "MyProject"] [-SequenceName "Timeline"] [-PresetName "Preset"]
 
 param(
     [string]$ProjectName = "",
-    [string]$SequenceName = ""
+    [string]$SequenceName = "",
+    [string]$PresetName = ""
 )
 
 $ServerUrl = "http://localhost:3000"
 
 Write-Host "=================================================="
-Write-Host "Premiere Pro Remote Project Creator" -ForegroundColor Cyan
+Write-Host "Premiere Pro Remote Project Creator v2.0" -ForegroundColor Cyan
 Write-Host "=================================================="
 Write-Host ""
 
@@ -19,6 +20,8 @@ try {
     $status = Invoke-RestMethod -Uri "$ServerUrl/status" -Method Get -TimeoutSec 5
     Write-Host "  Connected plugins: $($status.connectedClients)" -ForegroundColor Green
     Write-Host "  Save path: $($status.defaultSavePath)" -ForegroundColor Gray
+    Write-Host "  Default preset: $($status.defaultPreset)" -ForegroundColor Gray
+    Write-Host "  Default sequence: $($status.defaultSequence)" -ForegroundColor Gray
     
     if ($status.connectedClients -eq 0) {
         Write-Host ""
@@ -41,10 +44,11 @@ Write-Host ""
 $body = @{}
 if ($ProjectName) { $body["projectName"] = $ProjectName }
 if ($SequenceName) { $body["sequenceName"] = $SequenceName }
+if ($PresetName) { $body["presetName"] = $PresetName }
 
-Write-Host "Creating project..." -ForegroundColor Yellow
+Write-Host "Creating project with sequence..." -ForegroundColor Yellow
 if ($body.Count -gt 0) {
-    Write-Host "  Data: $($body | ConvertTo-Json -Compress)" -ForegroundColor Gray
+    Write-Host "  Custom settings: $($body | ConvertTo-Json -Compress)" -ForegroundColor Gray
 }
 
 try {
@@ -54,7 +58,9 @@ try {
     if ($response.success) {
         Write-Host ""
         Write-Host "SUCCESS!" -ForegroundColor Green
-        Write-Host "  Name: $($response.projectName)" -ForegroundColor White
+        Write-Host "  Project: $($response.projectName)" -ForegroundColor White
+        Write-Host "  Sequence: $($response.sequenceName)" -ForegroundColor White
+        Write-Host "  Preset: $($response.presetUsed)" -ForegroundColor Cyan
         Write-Host "  Path: $($response.projectPath)" -ForegroundColor Gray
     }
     else {

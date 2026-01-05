@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """
-Premiere Pro Remote Project Creator - Trigger Script
-Usage: python trigger.py [project_name] [sequence_name]
+Premiere Pro Remote Project Creator - Trigger Script v2.0
+Usage: python trigger.py [project_name] [sequence_name] [preset_name]
 
-No external dependencies required (uses built-in urllib)
+Features:
+- Auto sequence creation with custom preset
+- Default preset: 쇼츠영상용
+- No external dependencies (uses built-in urllib)
 """
 
 import urllib.request
@@ -13,8 +16,8 @@ import sys
 
 SERVER_URL = "http://localhost:3000"
 
-def create_project(project_name=None, sequence_name=None):
-    """Trigger new Premiere Pro project creation"""
+def create_project(project_name=None, sequence_name=None, preset_name=None):
+    """Trigger new Premiere Pro project creation with sequence"""
     
     endpoint = f"{SERVER_URL}/create-project"
     
@@ -23,11 +26,13 @@ def create_project(project_name=None, sequence_name=None):
         payload["projectName"] = project_name
     if sequence_name:
         payload["sequenceName"] = sequence_name
+    if preset_name:
+        payload["presetName"] = preset_name
     
-    print(f"Creating project...")
+    print(f"Creating project with sequence...")
     print(f"  Server: {endpoint}")
     if payload:
-        print(f"  Data: {json.dumps(payload, ensure_ascii=False)}")
+        print(f"  Custom: {json.dumps(payload, ensure_ascii=False)}")
     
     try:
         data = json.dumps(payload).encode('utf-8') if payload else b'{}'
@@ -44,6 +49,8 @@ def create_project(project_name=None, sequence_name=None):
             if result.get("success"):
                 print(f"\nSUCCESS!")
                 print(f"  Project: {result.get('projectName')}")
+                print(f"  Sequence: {result.get('sequenceName')}")
+                print(f"  Preset: {result.get('presetUsed')}")
                 print(f"  Path: {result.get('projectPath')}")
                 return True
             else:
@@ -70,6 +77,8 @@ def check_status():
             print(f"Server status:")
             print(f"  Connected plugins: {result.get('connectedClients', 0)}")
             print(f"  Save path: {result.get('defaultSavePath', 'N/A')}")
+            print(f"  Default preset: {result.get('defaultPreset', 'N/A')}")
+            print(f"  Default sequence: {result.get('defaultSequence', 'N/A')}")
             return result.get('connectedClients', 0) > 0
     except:
         print(f"Cannot connect to server")
@@ -79,9 +88,10 @@ if __name__ == "__main__":
     # Parse command line arguments
     project_name = sys.argv[1] if len(sys.argv) > 1 else None
     sequence_name = sys.argv[2] if len(sys.argv) > 2 else None
+    preset_name = sys.argv[3] if len(sys.argv) > 3 else None
     
     print("=" * 50)
-    print("Premiere Pro Remote Project Creator")
+    print("Premiere Pro Remote Project Creator v2.0")
     print("=" * 50)
     print()
     
@@ -93,7 +103,7 @@ if __name__ == "__main__":
     print()
     
     # Create project
-    success = create_project(project_name, sequence_name)
+    success = create_project(project_name, sequence_name, preset_name)
     print()
     
     sys.exit(0 if success else 1)
